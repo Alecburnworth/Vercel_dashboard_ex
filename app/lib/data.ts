@@ -179,6 +179,25 @@ export async function fetchCustomers() {
   }
 }
 
+export async function fetchCustomersPages(query: string) {
+  try {
+    const data = await sql`
+      SELECT
+        COUNT(*) AS count
+      FROM customers
+      WHERE
+      customers.name ILIKE ${`%${query}%`} OR
+      customers.email ILIKE ${`%${query}%`} 
+    `;
+
+    const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (err) {
+    console.error('Database Error:', err);
+    throw new Error('Failed to fetch all customers.');
+  }
+}
+
 export async function fetchFilteredCustomers(query: string) {
   try {
     const data = await sql<CustomersTableType[]>`
